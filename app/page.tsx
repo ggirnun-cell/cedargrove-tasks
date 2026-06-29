@@ -6,6 +6,7 @@
 // The full task UI replaces this in later milestones.
 import { SignOutButton } from "@clerk/nextjs";
 import { getCurrentUser } from "@/lib/auth";
+import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <header className="bg-cg-green text-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <div className="flex items-center gap-3">
-            <span className="text-lg font-bold tracking-tight">Cedar Grove</span>
+            <BrandMark className="h-8 w-auto" />
             <span className="text-sm text-cg-cream/80">Task Tracker</span>
           </div>
           <SignOutButton>

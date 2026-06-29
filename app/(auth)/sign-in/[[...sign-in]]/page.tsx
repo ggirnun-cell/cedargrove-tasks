@@ -1,4 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
+import { BrandMark } from "@/components/brand-mark";
 
 // Sign-in screen. Which methods appear (Google for the two Workspace domains,
 // email/password for invited outside users) is controlled in the Clerk
@@ -8,8 +9,9 @@ export const dynamic = "force-dynamic";
 export default function SignInPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-cg-cream px-4 py-10">
-      <div className="text-center">
-        <h1 className="text-xl font-bold tracking-tight text-cg-green">Cedar Grove · Task Tracker</h1>
+      <div className="flex flex-col items-center text-center">
+        <BrandMark className="h-10 w-auto" />
+        <p className="mt-3 text-sm font-semibold text-cg-green">Task Tracker</p>
         <p className="mt-1 text-sm text-cg-ink/70">Sign in with your work Google account.</p>
       </div>
       <SignIn
