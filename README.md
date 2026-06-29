@@ -11,10 +11,11 @@ reporting.
 
 ## Status
 
-Built in milestones (see `CLAUDE.md` §14). **Currently at M1 — database.**
-Schema + migrations + real seed data (regions, properties, role mailboxes, staff
-directory, super-admin users), a `/api/health` DB check, and a managed Postgres
-wired into `render.yaml`. Auth and task features come next (M2+).
+Built in milestones (see `CLAUDE.md` §14). **Currently at M2 — auth.**
+Clerk Google sign-in restricted to the two Workspace domains + allowlist,
+default-deny `middleware.ts`, the Clerk→`users` mirror webhook, and a
+sign-in-shows-nothing-until-provisioned landing. RBAC/property visibility is
+next (M3).
 
 Database commands: `npm run db:migrate` (apply schema), `npm run db:seed`
 (apply schema + load SEED_DATA.md). Both need `DATABASE_URL` set.

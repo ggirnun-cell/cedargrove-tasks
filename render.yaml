@@ -42,6 +42,15 @@ services:
         fromDatabase:
           name: cedar-grove-db-staging
           property: connectionString
+      # Clerk auth (M2). sync:false → Render prompts for these in the dashboard;
+      # they are never stored in this file or in git. The publishable key is
+      # public (shipped to the browser); the other two are secrets.
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_WEBHOOK_SIGNING_SECRET
+        sync: false
       # NOTE: do NOT set NODE_ENV=production here. It makes `npm ci` skip
       # devDependencies (tailwindcss, postcss, typescript), which breaks the
       # build. Next.js already runs build and `next start` in production mode
