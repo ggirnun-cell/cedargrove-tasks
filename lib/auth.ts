@@ -7,16 +7,10 @@
 import "server-only";
 import { currentUser } from "@clerk/nextjs/server";
 import { query } from "./db";
+import type { UserRole } from "./rbac";
 
-// RBAC roles, mirroring the Postgres `user_role` enum (db/schema.sql). Moves to
-// lib/rbac.ts in M3 where the hierarchy logic lives.
-export type UserRole =
-  | "read_only"
-  | "staff"
-  | "assistant_property_manager"
-  | "property_manager"
-  | "regional_manager"
-  | "super_admin";
+// Role hierarchy lives in lib/rbac.ts; re-exported here for existing importers.
+export type { UserRole };
 
 // The two Google Workspace domains that may self-register (CLAUDE.md §3).
 export const ALLOWED_SIGNUP_DOMAINS = [
@@ -131,4 +125,51 @@ export async function getCurrentUser(): Promise<AppUser | null> {
   const fullName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || null;
   const provisioned = await provisionUser({ email, fullName, clerkId: clerkUser.id });
   return provisioned && provisioned.isActive ? provisioned : null;
+}
+
+// SECURITY-CRITICAL (CLAUDE.md §5, §12). The set of property IDs this user may
+// access — the property-scope half of the visibility rule. EVERY property-scoped
+// query MUST filter by this; a query that bypasses it is a cross-property leak.
+//   - super_admin: every property (corporate sees all).
+//   - regional_manager: all properties in their assigned region(s), plus any
+//     directly-assigned properties.
+//   - property_manager / assistant_property_manager / staff / read_only: only
+//     their directly-assigned properties (none by default → sees nothing).
+// Re-queries live data each call, so newly-created properties are reflected.
+export async function getAllowedPropertyIds(user: Pick<AppUser, "id" | "role">): Promise<string[]> {
+  if (user.role === "super_admin") {
+    const all = await query<{ id: string }>("select id from properties");
+    return all.rows.map((row) => row.id);
+  }
+
+  const ids = new Set<string>();
+
+  if (user.role === "regional_manager") {
+    const byRegion = await query<{ id: string }>(
+      `select p.id
+         from properties p
+         join user_region_assignments ura on ura.region_id = p.region_id
+        where ura.user_id = $1`,
+      [user.id],
+    );
+    for (const row of byRegion.rows) ids.add(row.id);
+  }
+
+  const direct = await query<{ property_id: string }>(
+    "select property_id from user_property_assignments where user_id = $1",
+    [user.id],
+  );
+  for (const row of direct.rows) ids.add(row.property_id);
+
+  return [...ids];
+}
+
+// Convenience guard for a single property. Prefer fetching getAllowedPropertyIds
+// once when checking many rows.
+export async function canAccessProperty(
+  user: Pick<AppUser, "id" | "role">,
+  propertyId: string,
+): Promise<boolean> {
+  if (user.role === "super_admin") return true;
+  return (await getAllowedPropertyIds(user)).includes(propertyId);
 }

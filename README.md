@@ -11,11 +11,10 @@ reporting.
 
 ## Status
 
-Built in milestones (see `CLAUDE.md` §14). **Currently at M2 — auth.**
-Clerk Google sign-in restricted to the two Workspace domains + allowlist,
-default-deny `middleware.ts`, the Clerk→`users` mirror webhook, and a
-sign-in-shows-nothing-until-provisioned landing. RBAC/property visibility is
-next (M3).
+Built in milestones (see `CLAUDE.md` §14). **Currently at M3 — RBAC core.**
+The §5 visibility rule: `getAllowedPropertyIds` (lib/auth.ts) for cross-property
+isolation, plus the role hierarchy and function-level task visibility
+(lib/rbac.ts). Admin UI to grant access is next (M4).
 
 Database commands: `npm run db:migrate` (apply schema), `npm run db:seed`
 (apply schema + load SEED_DATA.md). Both need `DATABASE_URL` set.
