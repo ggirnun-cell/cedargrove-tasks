@@ -15,7 +15,10 @@ services:
     region: ohio
     branch: main
     autoDeploy: true # staging auto-deploys on every push to main (CLAUDE.md §10).
-    buildCommand: npm ci && npm run build
+    # --include=dev forces devDependencies (tailwindcss, postcss, typescript) to
+    # install even if NODE_ENV=production lingers on the service, which would
+    # otherwise make npm skip them and break the build.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
