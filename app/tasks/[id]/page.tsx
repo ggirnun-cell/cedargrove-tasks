@@ -23,7 +23,13 @@ function fmt(ts: string | null): string {
   return ts ? new Date(ts).toISOString().replace("T", " ").slice(0, 16) + " UTC" : "—";
 }
 
-export default async function TaskDetailPage({ params }: { params: { id: string } }) {
+export default async function TaskDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { error?: string };
+}) {
   const me = await getCurrentUser();
   if (!me) redirect("/");
 
@@ -40,6 +46,12 @@ export default async function TaskDetailPage({ params }: { params: { id: string 
         <Link href="/tasks" className="text-sm text-cg-green hover:underline">
           ← Back to tasks
         </Link>
+
+        {searchParams.error && (
+          <p className="mt-3 rounded border border-cg-copper/40 bg-cg-copper/10 px-3 py-2 text-sm text-cg-ink/80">
+            {searchParams.error}
+          </p>
+        )}
 
         <div className="mt-2 flex items-start justify-between gap-4">
           <div>

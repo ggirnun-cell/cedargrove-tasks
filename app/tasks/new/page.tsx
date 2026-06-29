@@ -17,7 +17,11 @@ const CADENCES = [
   { value: "weekly", label: "Weekly" },
 ];
 
-export default async function NewTaskPage() {
+export default async function NewTaskPage({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) {
   const me = await getCurrentUser();
   if (!me) redirect("/");
   if (!hasRole(me, "assistant_property_manager")) redirect("/tasks");
@@ -30,6 +34,12 @@ export default async function NewTaskPage() {
           ← Back to tasks
         </Link>
         <h1 className="mt-2 text-xl font-semibold text-cg-green">New task</h1>
+
+        {searchParams.error && (
+          <p className="mt-3 rounded border border-cg-copper/40 bg-cg-copper/10 px-3 py-2 text-sm text-cg-ink/80">
+            {searchParams.error}
+          </p>
+        )}
 
         <form action={createTaskAction} className="mt-5 space-y-5">
           <label className="block">

@@ -46,15 +46,22 @@ export async function createTaskAction(formData: FormData): Promise<void> {
   const me = await getCurrentUser();
   if (!me) redirect("/sign-in");
 
-  await createTasks(me, {
-    title: String(formData.get("title") ?? ""),
-    notes: String(formData.get("notes") ?? "") || null,
-    priority: readPriority(formData),
-    cadence: readCadence(formData),
-    escalationThreshold: Number(formData.get("escalationThreshold") ?? 3),
-    targets: parseTargets(String(formData.get("targets") ?? "[]")),
-  });
+  // Catch only the work — never the redirect() calls, which throw by design.
+  let error = "";
+  try {
+    await createTasks(me, {
+      title: String(formData.get("title") ?? ""),
+      notes: String(formData.get("notes") ?? "") || null,
+      priority: readPriority(formData),
+      cadence: readCadence(formData),
+      escalationThreshold: Number(formData.get("escalationThreshold") ?? 3),
+      targets: parseTargets(String(formData.get("targets") ?? "[]")),
+    });
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Could not create the task.";
+  }
 
+  if (error) redirect(`/tasks/new?error=${encodeURIComponent(error)}`);
   revalidatePath("/tasks");
   redirect("/tasks");
 }
@@ -64,14 +71,20 @@ export async function updateTaskAction(formData: FormData): Promise<void> {
   if (!me) redirect("/sign-in");
   const taskId = String(formData.get("taskId") ?? "");
 
-  await updateTask(me, taskId, {
-    title: String(formData.get("title") ?? ""),
-    notes: String(formData.get("notes") ?? "") || null,
-    priority: readPriority(formData),
-    cadence: readCadence(formData),
-    escalationThreshold: Number(formData.get("escalationThreshold") ?? 3),
-  });
+  let error = "";
+  try {
+    await updateTask(me, taskId, {
+      title: String(formData.get("title") ?? ""),
+      notes: String(formData.get("notes") ?? "") || null,
+      priority: readPriority(formData),
+      cadence: readCadence(formData),
+      escalationThreshold: Number(formData.get("escalationThreshold") ?? 3),
+    });
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Could not save the task.";
+  }
 
+  if (error) redirect(`/tasks/${taskId}?error=${encodeURIComponent(error)}`);
   revalidatePath("/tasks");
   revalidatePath(`/tasks/${taskId}`);
   redirect(`/tasks/${taskId}`);
