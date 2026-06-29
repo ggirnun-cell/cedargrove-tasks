@@ -1,0 +1,24 @@
+# Render Blueprint (Infrastructure-as-code) — CLAUDE.md §10.
+#
+# M0 scope: a single STAGING web service that builds and serves the empty
+# Next.js scaffold. No database, cron, or secrets yet — those are added in
+# later milestones (Postgres in M1, the digest cron in M6, a separate
+# production environment in M8).
+#
+# How Geoff uses this: in the Render dashboard choose "New > Blueprint",
+# connect the GitHub repo, and Render reads this file to create the service.
+services:
+  - type: web
+    name: cedar-grove-tasks-staging
+    runtime: node
+    plan: starter # paid; free web services sleep and cold-start slowly.
+    region: ohio
+    branch: main
+    autoDeploy: true # staging auto-deploys on every push to main (CLAUDE.md §10).
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20.14.0"
+      - key: NODE_ENV
+        value: production

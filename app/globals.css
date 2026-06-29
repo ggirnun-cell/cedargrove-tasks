@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Cedar Grove brand tokens (CLAUDE.md §9). Mirrored as Tailwind colors in
+   tailwind.config.ts; kept here as CSS variables for any non-utility use. */
+:root {
+  --cg-green: #334e44;
+  --cg-copper: #b36629;
+  --cg-cream: #f3e4d2;
+  --cg-ink: #1a1a1a; /* near-black body text on cream/white */
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--cg-ink);
+  font-family: Arial, Helvetica, system-ui, sans-serif;
+  /* Dense-but-readable baseline; avoid oversized default spacing. */
+  line-height: 1.5;
+}
