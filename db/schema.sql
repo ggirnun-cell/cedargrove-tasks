@@ -5,8 +5,8 @@
 -- scripts/apply-migrations.ts). When you add a migration, update this file to
 -- match so it always reflects the live schema in one place.
 --
--- As of Milestone 1, the schema below equals db/migrations/0001_init.sql.
--- (Tasks + ping_log arrive in M5/M6, audit_log in M4.)
+-- As of Milestone 4, the schema below equals migrations 0001_init + 0002_audit_log.
+-- (Tasks + ping_log arrive in M5/M6.)
 
 create extension if not exists pgcrypto;
 create extension if not exists citext;
@@ -105,3 +105,17 @@ create table user_region_assignments (
   assigned_at timestamptz not null default now(),
   primary key (user_id, region_id)
 );
+
+create table audit_log (
+  id            bigint generated always as identity primary key,
+  actor_user_id uuid references users(id) on delete set null,
+  actor_email   citext,
+  action        text not null,
+  target_type   text,
+  target_id     text,
+  detail        jsonb,
+  created_at    timestamptz not null default now()
+);
+create index audit_log_created_idx on audit_log (created_at desc);
+create index audit_log_actor_idx on audit_log (actor_user_id);
+create index audit_log_target_idx on audit_log (target_type, target_id);

@@ -5,8 +5,10 @@
 // new sign-ins as `read_only`. getAllowedPropertyIds (the property-visibility
 // half of §5) arrives in M3 (lib/rbac.ts + here) — not yet present.
 import "server-only";
+import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { query } from "./db";
+import { canManageUsers } from "./rbac";
 import type { UserRole } from "./rbac";
 
 // Role hierarchy lives in lib/rbac.ts; re-exported here for existing importers.
@@ -172,4 +174,15 @@ export async function canAccessProperty(
 ): Promise<boolean> {
   if (user.role === "super_admin") return true;
   return (await getAllowedPropertyIds(user)).includes(propertyId);
+}
+
+// SECURITY-CRITICAL. Gate for the /admin area and its server actions. Returns
+// the current user if they may manage users (super_admin or the can_manage_users
+// capability), otherwise redirects. MUST be called in every admin server action,
+// not just the page/layout — never trust the UI gate alone.
+export async function requireManageUsers(): Promise<AppUser> {
+  const me = await getCurrentUser();
+  if (!me) redirect("/sign-in");
+  if (!canManageUsers(me)) redirect("/"); // authenticated but not authorized.
+  return me;
 }

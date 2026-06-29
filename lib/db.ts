@@ -4,7 +4,7 @@
 // during `next build` (which has no DATABASE_URL) is safe. In development the
 // pool is cached on `globalThis` to survive hot-reloads without leaking
 // connections.
-import { Pool, type QueryResult, type QueryResultRow } from "pg";
+import { Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 import { requireEnv } from "./env";
 
 // Render-hosted Postgres requires TLS; a local Postgres typically does not.
@@ -33,4 +33,22 @@ export function query<T extends QueryResultRow = QueryResultRow>(
   params?: unknown[],
 ): Promise<QueryResult<T>> {
   return getPool().query<T>(text, params as never);
+}
+
+// Run `fn` inside a single transaction; commit on success, roll back on throw.
+// Use for multi-statement writes that must be atomic (e.g. re-syncing a user's
+// property assignments together with its audit entry).
+export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    const result = await fn(client);
+    await client.query("commit");
+    return result;
+  } catch (err) {
+    await client.query("rollback");
+    throw err;
+  } finally {
+    client.release();
+  }
 }

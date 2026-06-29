@@ -4,8 +4,10 @@
 //   - role read_only with no properties → the default-deny state every new
 //     sign-in lands in until a super-admin grants access (CLAUDE.md §3)
 // The full task UI replaces this in later milestones.
+import Link from "next/link";
 import { SignOutButton } from "@clerk/nextjs";
 import { getCurrentUser } from "@/lib/auth";
+import { canManageUsers } from "@/lib/rbac";
 import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
@@ -91,6 +93,17 @@ export default async function HomePage() {
           <p className="mt-5 text-sm text-cg-ink/80">
             Your access is provisioned. Task lists and creation arrive in the next milestone.
           </p>
+        )}
+
+        {canManageUsers(user) && (
+          <div className="mt-5 border-t border-cg-green/10 pt-4">
+            <Link
+              href="/admin/users"
+              className="inline-block rounded bg-cg-green px-3 py-1.5 text-sm font-medium text-white hover:bg-cg-green/90"
+            >
+              Manage users & access →
+            </Link>
+          </div>
         )}
       </div>
 

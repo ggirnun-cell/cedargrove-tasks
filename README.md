@@ -11,10 +11,11 @@ reporting.
 
 ## Status
 
-Built in milestones (see `CLAUDE.md` §14). **Currently at M3 — RBAC core.**
-The §5 visibility rule: `getAllowedPropertyIds` (lib/auth.ts) for cross-property
-isolation, plus the role hierarchy and function-level task visibility
-(lib/rbac.ts). Admin UI to grant access is next (M4).
+Built in milestones (see `CLAUDE.md` §14). **Currently at M4 — admin & audit.**
+An `/admin` area (gated to super-admins + the can_manage_users capability) to
+grant access — set role/capability/active and assign properties/regions — with
+privilege-escalation and self-lockout guards, plus an audit trail (`lib/audit.ts`,
+`audit_log`) of every sensitive write and read. Tasks are next (M5).
 
 Database commands: `npm run db:migrate` (apply schema), `npm run db:seed`
 (apply schema + load SEED_DATA.md). Both need `DATABASE_URL` set.
