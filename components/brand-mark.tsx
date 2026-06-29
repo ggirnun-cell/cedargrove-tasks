@@ -6,7 +6,7 @@ import { useState } from "react";
 // until the asset is added (CLAUDE.md §9 — Geoff drops cedar-grove-logo.svg or
 // .png into public/; we do not invent a logo). Tries SVG then PNG, then text,
 // so the header always looks intentional regardless of which file exists.
-const SOURCES = ["/cedar-grove-logo.svg", "/cedar-grove-logo.png"];
+const SOURCES = ["/cedar-grove-logo.png"];
 
 export function BrandMark({ className = "h-8 w-auto" }: { className?: string }) {
   const [index, setIndex] = useState(0);

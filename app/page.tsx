@@ -22,14 +22,16 @@ const ROLE_LABELS: Record<string, string> = {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-cg-cream">
-      <header className="bg-cg-green text-white">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
+      <header className="border-b-2 border-cg-copper bg-white">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">
           <div className="flex items-center gap-3">
-            <BrandMark className="h-8 w-auto" />
-            <span className="text-sm text-cg-cream/80">Task Tracker</span>
+            <BrandMark className="h-9 w-auto" />
+            <span className="hidden border-l border-cg-green/20 pl-3 text-sm font-medium text-cg-green sm:inline">
+              Task Tracker
+            </span>
           </div>
           <SignOutButton>
-            <button className="rounded border border-white/30 px-3 py-1 text-xs font-medium hover:bg-white/10">
+            <button className="rounded border border-cg-green/30 px-3 py-1 text-xs font-medium text-cg-green hover:bg-cg-green/5">
               Sign out
             </button>
           </SignOutButton>
