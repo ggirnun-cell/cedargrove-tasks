@@ -11,6 +11,7 @@ import { getAllowedPropertyIds, type AppUser } from "./auth";
 import { hasRole, requireRole, type JobFunction, type UserRole } from "./rbac";
 import { writeAuditEntry } from "./audit";
 import { sendEmail, appUrl } from "./email";
+import { sendCreationPings } from "./digest";
 
 export type TaskPriority = "low" | "medium" | "high";
 export type PingCadence = "daily" | "every_2_days" | "every_3_days" | "weekly";
@@ -169,7 +170,7 @@ export async function createTasks(creator: AppUser, input: CreateTaskInput): Pro
     ? Math.min(Math.max(Math.trunc(input.escalationThreshold), 1), 99)
     : 3;
 
-  return withTransaction(async (client) => {
+  const created = await withTransaction(async (client) => {
     const ids: string[] = [];
     for (const target of input.targets) {
       let regionId: string | null = null;
@@ -217,6 +218,11 @@ export async function createTasks(creator: AppUser, input: CreateTaskInput): Pro
     );
     return ids;
   });
+
+  // Immediate ping on creation (outside the transaction — email is a network
+  // call). No-ops cleanly until Resend is configured.
+  await sendCreationPings(created);
+  return created;
 }
 
 // Toggle completion. Authorizes (visible + not read_only), audits the toggle

@@ -16,6 +16,15 @@ databases:
     region: ohio
     postgresMajorVersion: "16"
 
+# Shared env vars (M6). CRON_SECRET is auto-generated once and shared by the web
+# service (which validates it on /api/cron/digest) and the cron job (which sends
+# it) — so they always match and Geoff never types it.
+envVarGroups:
+  - name: cedar-grove-shared
+    envVars:
+      - key: CRON_SECRET
+        generateValue: true
+
 services:
   - type: web
     name: cedar-grove-tasks-staging
@@ -51,7 +60,37 @@ services:
         sync: false
       - key: CLERK_WEBHOOK_SIGNING_SECRET
         sync: false
+      # Email engine (M6). RESEND_API_KEY + MAIL_FROM enable real sends; until
+      # they're set, email logs-and-skips. APP_BASE_URL builds links in emails.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      # CRON_SECRET, shared with the cron job below so the digest endpoint
+      # authenticates it.
+      - fromGroup: cedar-grove-shared
       # NOTE: do NOT set NODE_ENV=production here. It makes `npm ci` skip
       # devDependencies (tailwindcss, postcss, typescript), which breaks the
       # build. Next.js already runs build and `next start` in production mode
       # automatically, so the runtime is unaffected.
+
+  # Daily ping + escalation digest (M6). Fires once each morning and POSTs to the
+  # web service's authed /api/cron/digest endpoint, which does the actual work.
+  # 11:00 UTC ≈ 07:00 US Eastern (EDT; 06:00 during EST — Render cron is fixed
+  # UTC with no DST, a 1-hour seasonal drift that's fine for a morning digest).
+  - type: cron
+    name: cedar-grove-digest-staging
+    runtime: node
+    region: ohio
+    branch: main
+    schedule: "0 11 * * *"
+    buildCommand: npm ci
+    startCommand: node scripts/trigger-digest.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: "20.14.0"
+      - key: APP_BASE_URL
+        sync: false # same staging URL as the web service
+      - fromGroup: cedar-grove-shared

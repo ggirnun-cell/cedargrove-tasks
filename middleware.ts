@@ -12,6 +12,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks/clerk", // Clerk → users mirror; verified by signature, not session.
+  "/api/cron/digest", // ping engine; authed by CRON_SECRET, not a session.
   "/api/health", // uptime probe; no user data.
 ]);
 

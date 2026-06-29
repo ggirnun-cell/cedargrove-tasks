@@ -11,11 +11,11 @@ reporting.
 
 ## Status
 
-Built in milestones (see `CLAUDE.md` §14). **Currently at M5 — tasks.**
-Create/edit tasks with a type-ahead assignee picker (role mailbox / person /
-email), multi-property fan-out, a visibility-filtered task list, `/my-tasks`,
-one-tap complete with creator notification, and full cycle-time capture. The
-daily ping/escalation engine is next (M6).
+Built in milestones (see `CLAUDE.md` §14). **Currently at M6 — ping engine.**
+Immediate ping on task creation + a daily 7am consolidated digest per recipient,
+escalation to the regional manager + corporate (corporate-only where there's no
+RM), all via Resend, driven by a Render cron job hitting the authed
+`/api/cron/digest`. Reports are next (M7).
 
 Database commands: `npm run db:migrate` (apply schema), `npm run db:seed`
 (apply schema + load SEED_DATA.md). Both need `DATABASE_URL` set.
