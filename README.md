@@ -11,9 +11,13 @@ reporting.
 
 ## Status
 
-Built in milestones (see `CLAUDE.md` §14). **Currently at M0 — scaffold only:**
-an empty Next.js app with the brand theme and a Render staging deploy. No
-database, auth, or task features yet.
+Built in milestones (see `CLAUDE.md` §14). **Currently at M1 — database.**
+Schema + migrations + real seed data (regions, properties, role mailboxes, staff
+directory, super-admin users), a `/api/health` DB check, and a managed Postgres
+wired into `render.yaml`. Auth and task features come next (M2+).
+
+Database commands: `npm run db:migrate` (apply schema), `npm run db:seed`
+(apply schema + load SEED_DATA.md). Both need `DATABASE_URL` set.
 
 ## Stack
 

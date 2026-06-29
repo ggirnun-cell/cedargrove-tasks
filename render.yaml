@@ -7,6 +7,15 @@
 #
 # How Geoff uses this: in the Render dashboard choose "New > Blueprint",
 # connect the GitHub repo, and Render reads this file to create the service.
+# Managed Postgres (M1). PAID plan — the free plan expires after 90 days and
+# deletes data, so it must never be used for staging or prod (CLAUDE.md §10).
+# basic-256mb is the smallest paid tier (~$6/mo), ample for staff-internal use.
+databases:
+  - name: cedar-grove-db-staging
+    plan: basic-256mb
+    region: ohio
+    postgresMajorVersion: "16"
+
 services:
   - type: web
     name: cedar-grove-tasks-staging
@@ -19,10 +28,20 @@ services:
     # install even if NODE_ENV=production lingers on the service, which would
     # otherwise make npm skip them and break the build.
     buildCommand: npm ci --include=dev && npm run build
+    # Apply pending DB migrations before each deploy goes live. Idempotent —
+    # already-applied migrations are skipped. Seeding is a separate one-time
+    # step (npm run db:seed), intentionally NOT run automatically.
+    preDeployCommand: npm run db:migrate
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: "20.14.0"
+      # DATABASE_URL is injected from the managed database above — no secret is
+      # ever typed by hand or committed.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cedar-grove-db-staging
+          property: connectionString
       # NOTE: do NOT set NODE_ENV=production here. It makes `npm ci` skip
       # devDependencies (tailwindcss, postcss, typescript), which breaks the
       # build. Next.js already runs build and `next start` in production mode
