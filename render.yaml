@@ -20,5 +20,7 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "20.14.0"
-      - key: NODE_ENV
-        value: production
+      # NOTE: do NOT set NODE_ENV=production here. It makes `npm ci` skip
+      # devDependencies (tailwindcss, postcss, typescript), which breaks the
+      # build. Next.js already runs build and `next start` in production mode
+      # automatically, so the runtime is unaffected.
