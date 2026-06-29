@@ -90,21 +90,31 @@ export default async function HomePage() {
             to a property or role.
           </p>
         ) : (
-          <p className="mt-5 text-sm text-cg-ink/80">
-            Your access is provisioned. Task lists and creation arrive in the next milestone.
-          </p>
+          <p className="mt-5 text-sm text-cg-ink/80">Your access is provisioned.</p>
         )}
 
-        {canManageUsers(user) && (
-          <div className="mt-5 border-t border-cg-green/10 pt-4">
+        <div className="mt-5 flex flex-wrap gap-2 border-t border-cg-green/10 pt-4">
+          <Link
+            href="/tasks"
+            className="rounded bg-cg-copper px-3 py-1.5 text-sm font-medium text-white hover:bg-cg-copper/90"
+          >
+            View tasks →
+          </Link>
+          <Link
+            href="/my-tasks"
+            className="rounded border border-cg-green/30 px-3 py-1.5 text-sm font-medium text-cg-green hover:bg-cg-green/5"
+          >
+            My tasks
+          </Link>
+          {canManageUsers(user) && (
             <Link
               href="/admin/users"
-              className="inline-block rounded bg-cg-green px-3 py-1.5 text-sm font-medium text-white hover:bg-cg-green/90"
+              className="rounded border border-cg-green/30 px-3 py-1.5 text-sm font-medium text-cg-green hover:bg-cg-green/5"
             >
-              Manage users & access →
+              Manage users
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <p className="mt-4 text-xs text-cg-ink/50">

@@ -5,8 +5,7 @@
 -- scripts/apply-migrations.ts). When you add a migration, update this file to
 -- match so it always reflects the live schema in one place.
 --
--- As of Milestone 4, the schema below equals migrations 0001_init + 0002_audit_log.
--- (Tasks + ping_log arrive in M5/M6.)
+-- As of Milestone 5, the schema below equals migrations 0001 + 0002 + 0003_tasks.
 
 create extension if not exists pgcrypto;
 create extension if not exists citext;
@@ -119,3 +118,45 @@ create table audit_log (
 create index audit_log_created_idx on audit_log (created_at desc);
 create index audit_log_actor_idx on audit_log (actor_user_id);
 create index audit_log_target_idx on audit_log (target_type, target_id);
+
+create type task_priority as enum ('low', 'medium', 'high');
+create type ping_cadence as enum ('daily', 'every_2_days', 'every_3_days', 'weekly');
+
+create table tasks (
+  id        uuid primary key default gen_random_uuid(),
+  origin_id uuid not null,
+  title     text not null,
+  notes     text,
+  priority  task_priority not null default 'medium',
+  cadence   ping_cadence  not null default 'daily',
+  escalation_threshold integer not null default 3,
+  property_id  text references properties(id),
+  region_id    text references regions(id),
+  job_function job_function,
+  assignee_label  text not null,
+  recipient_email citext,
+  created_by   uuid not null references users(id),
+  created_at   timestamptz not null default now(),
+  completed_at timestamptz,
+  completed_by uuid references users(id),
+  is_complete  boolean generated always as (completed_at is not null) stored,
+  escalated_at timestamptz,
+  last_ping_at timestamptz,
+  ping_count   integer not null default 0,
+  updated_at   timestamptz not null default now()
+);
+create index tasks_origin_idx on tasks (origin_id);
+create index tasks_property_idx on tasks (property_id);
+create index tasks_region_idx on tasks (region_id);
+create index tasks_open_idx on tasks (is_complete) where is_complete = false;
+create index tasks_recipient_idx on tasks (recipient_email);
+create index tasks_created_by_idx on tasks (created_by);
+
+create table ping_log (
+  id        bigint generated always as identity primary key,
+  task_id   uuid not null references tasks(id) on delete cascade,
+  recipient citext,
+  sent_at   timestamptz not null default now()
+);
+create index ping_log_task_idx on ping_log (task_id);
+create index ping_log_sent_idx on ping_log (sent_at);

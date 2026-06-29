@@ -11,11 +11,11 @@ reporting.
 
 ## Status
 
-Built in milestones (see `CLAUDE.md` §14). **Currently at M4 — admin & audit.**
-An `/admin` area (gated to super-admins + the can_manage_users capability) to
-grant access — set role/capability/active and assign properties/regions — with
-privilege-escalation and self-lockout guards, plus an audit trail (`lib/audit.ts`,
-`audit_log`) of every sensitive write and read. Tasks are next (M5).
+Built in milestones (see `CLAUDE.md` §14). **Currently at M5 — tasks.**
+Create/edit tasks with a type-ahead assignee picker (role mailbox / person /
+email), multi-property fan-out, a visibility-filtered task list, `/my-tasks`,
+one-tap complete with creator notification, and full cycle-time capture. The
+daily ping/escalation engine is next (M6).
 
 Database commands: `npm run db:migrate` (apply schema), `npm run db:seed`
 (apply schema + load SEED_DATA.md). Both need `DATABASE_URL` set.
