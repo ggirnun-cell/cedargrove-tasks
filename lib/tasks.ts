@@ -120,6 +120,56 @@ export async function getMyOpenTasks(user: AppUser): Promise<TaskRow[]> {
   return result.rows;
 }
 
+// Reporting (CLAUDE.md §8). Same §5 visibility as the task list, plus optional
+// filters. Outstanding filters on created_at; completed on completed_at.
+export type ReportFilter = {
+  status: "outstanding" | "completed";
+  propertyId?: string;
+  regionId?: string;
+  person?: string; // matches recipient email (contains)
+  priority?: TaskPriority;
+  from?: string; // YYYY-MM-DD (inclusive)
+  to?: string; // YYYY-MM-DD (inclusive)
+};
+
+export async function getReport(user: AppUser, filter: ReportFilter): Promise<TaskRow[]> {
+  const { clause, params } = await visibilityClause(user);
+  const where: string[] = [clause];
+  const p = [...params];
+
+  where.push(filter.status === "completed" ? "t.is_complete = true" : "t.is_complete = false");
+  if (filter.propertyId) {
+    p.push(filter.propertyId);
+    where.push(`t.property_id = $${p.length}`);
+  }
+  if (filter.regionId) {
+    p.push(filter.regionId);
+    where.push(`t.region_id = $${p.length}`);
+  }
+  if (filter.person) {
+    p.push(`%${filter.person}%`);
+    where.push(`t.recipient_email ilike $${p.length}`);
+  }
+  if (filter.priority) {
+    p.push(filter.priority);
+    where.push(`t.priority = $${p.length}::task_priority`);
+  }
+  const dateCol = filter.status === "completed" ? "t.completed_at" : "t.created_at";
+  if (filter.from) {
+    p.push(filter.from);
+    where.push(`${dateCol} >= $${p.length}::date`);
+  }
+  if (filter.to) {
+    p.push(filter.to);
+    where.push(`${dateCol} < ($${p.length}::date + 1)`); // inclusive of the whole 'to' day
+  }
+
+  const orderBy = filter.status === "completed" ? "t.completed_at desc" : "t.created_at desc";
+  const sql = `${SELECT} where ${where.join(" and ")} order by ${orderBy} limit 1000`;
+  const result = await query<TaskRow>(sql, p);
+  return result.rows;
+}
+
 // read_only can view but never act (CLAUDE.md §4a). Completion authority is
 // otherwise equivalent to visibility (assignee + everyone above the assignee).
 export function canActOnTasks(user: Pick<AppUser, "role">): boolean {

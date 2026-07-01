@@ -106,6 +106,12 @@ export default async function HomePage() {
           >
             My tasks
           </Link>
+          <Link
+            href="/reports"
+            className="rounded border border-cg-green/30 px-3 py-1.5 text-sm font-medium text-cg-green hover:bg-cg-green/5"
+          >
+            Reports
+          </Link>
           {canManageUsers(user) && (
             <Link
               href="/admin/users"

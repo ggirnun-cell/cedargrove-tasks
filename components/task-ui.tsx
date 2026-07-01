@@ -26,6 +26,14 @@ export function AgeLabel({ createdAt }: { createdAt: string }) {
   return <span className="text-cg-ink/60">{d === 0 ? "today" : `${d}d`}</span>;
 }
 
+// Human "time to complete" for the completed report.
+export function timeToComplete(createdAt: string, completedAt: string | null): string {
+  if (!completedAt) return "—";
+  const days = (new Date(completedAt).getTime() - new Date(createdAt).getTime()) / 86_400_000;
+  if (days < 1) return "<1 day";
+  return `${days.toFixed(1)} days`;
+}
+
 // One-tap complete / reopen via the server action. `canAct` hides it from
 // read-only viewers.
 export function CompleteForm({

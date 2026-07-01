@@ -6,7 +6,13 @@ import type { AppUser } from "@/lib/auth";
 
 // Shared top nav for the signed-in app. Server component (reads role to decide
 // whether to show the Admin link).
-export function AppHeader({ user, active }: { user: AppUser; active?: "tasks" | "my" | "admin" }) {
+export function AppHeader({
+  user,
+  active,
+}: {
+  user: AppUser;
+  active?: "tasks" | "my" | "reports" | "admin";
+}) {
   const cls = (key: string) =>
     `font-medium hover:underline ${active === key ? "text-cg-copper" : "text-cg-green"}`;
   return (
@@ -21,6 +27,9 @@ export function AppHeader({ user, active }: { user: AppUser; active?: "tasks" | 
           </Link>
           <Link href="/my-tasks" className={cls("my")}>
             My Tasks
+          </Link>
+          <Link href="/reports" className={cls("reports")}>
+            Reports
           </Link>
           {canManageUsers(user) && (
             <Link href="/admin/users" className={cls("admin")}>
