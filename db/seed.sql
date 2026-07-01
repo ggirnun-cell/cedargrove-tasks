@@ -66,19 +66,66 @@ insert into role_mailboxes (property_id, function, email) values
 on conflict (property_id, function) do update set
   email = excluded.email, is_active = true;
 
--- 4. Login users — super-admin bootstrap only (SEED_DATA §4/§6) -----------------
--- Everyone else is created on first sign-in (M2) as read_only. Cara & Jackie are
--- seeded as full super_admin per Geoff's decision (2026-06-29). Shelley is
--- read_only pending scope confirmation (default-deny).
+-- 4. Login users — seeded from roster/people.csv with pre-granted access
+-- (Geoff's decision 2026-07-01). Property-mailbox logins have no name until the
+-- person signs in. Re-seeding RESETS role to the roster; clerk_id/name from
+-- sign-in are preserved. Access is granted in section 4b.
 insert into users (email, full_name, role, can_manage_users) values
-  ('geoff@cedargrovecp.com',                 'Geoff Girnun',     'super_admin', true),
-  ('steve@cedargrovecp.com',                 'Steven Levitz',    'super_admin', true),
-  ('aarongorin@gmail.com',                   'Aaron Gorin',      'super_admin', true),
-  ('cara@covenantpropertyservices.com',      'Cara McConnachie', 'super_admin', true),
-  ('jackie@covenantpropertyservices.com',    'Jackie Eriksen',   'super_admin', true),
-  ('shelley@covenantpropertyservices.com',   'Shelley Balanda',  'read_only',   false) -- scope TBD, confirm w/ Geoff
+  ('geoff@cedargrovecp.com', 'Geoff Girnun', 'super_admin', true),
+  ('steve@cedargrovecp.com', 'Steven Levitz', 'super_admin', true),
+  ('aarongorin@gmail.com', 'Aaron Gorin', 'super_admin', true),
+  ('cara@covenantpropertyservices.com', 'Cara McConnachie', 'super_admin', true),
+  ('jackie@covenantpropertyservices.com', 'Jackie Eriksen', 'super_admin', true),
+  ('shelley@covenantpropertyservices.com', 'Shelley Balanda', 'read_only', false),
+  ('jward@covenantpropertyservices.com', 'Jerika Ward', 'regional_manager', false),
+  ('kingsparkpm@covenantpropertyservices.com', null, 'property_manager', false),
+  ('LakewoodOaksPM@covenantpropertyservices.com', 'Vivianna Pinero', 'property_manager', false),
+  ('Lakewoodoaksleasing@covenantpropertyservices.com', 'Pedro Tellez Dacal', 'staff', false),
+  ('magnoliapointpm@covenantpropertyservices.com', 'Tyra Jackson', 'property_manager', false),
+  ('magnoliapointapm@covenantpropertyservices.com', 'Leyla Nieto Perez', 'assistant_property_manager', false),
+  ('magnoliapointleasing@covenantpropertyservices.com', 'Luis Batencourt', 'staff', false),
+  ('oasisclubpm@covenantpropertyservices.com', 'Linda Quasnick', 'property_manager', false),
+  ('oasisclubapm@covenantpropertyservices.com', 'Elma Avila', 'assistant_property_manager', false),
+  ('aurora2700PM@covenantpropertyservices.com', 'Teyani Stanton', 'property_manager', false),
+  ('aurora2700APM@covenantpropertyservices.com', null, 'assistant_property_manager', false),
+  ('Cielo325PM@covenantpropertyservices.com', 'Dana Darby', 'property_manager', false),
+  ('GALeasingFloater@covenantpropertyservices.com', null, 'staff', false),
+  ('crose@covenantpropertyservices.com', 'Courtney (CJ) Rose', 'property_manager', false)
 on conflict (email) do update set
-  full_name = excluded.full_name, role = excluded.role, can_manage_users = excluded.can_manage_users;
+  full_name = coalesce(excluded.full_name, users.full_name),
+  role = excluded.role,
+  can_manage_users = excluded.can_manage_users;
+
+-- 4b. Property/region access from the roster (additive — ON CONFLICT keeps any
+-- assignments an admin added via the UI). Super-admins need no rows (see all).
+insert into user_property_assignments (user_id, property_id)
+  select u.id, v.property_id from users u
+    join (values
+    ('kingsparkpm@covenantpropertyservices.com', 'kings-tree'),
+    ('kingsparkpm@covenantpropertyservices.com', 'park-place'),
+    ('LakewoodOaksPM@covenantpropertyservices.com', 'lakewood-oaks'),
+    ('Lakewoodoaksleasing@covenantpropertyservices.com', 'lakewood-oaks'),
+    ('magnoliapointpm@covenantpropertyservices.com', 'magnolia-point'),
+    ('magnoliapointapm@covenantpropertyservices.com', 'magnolia-point'),
+    ('magnoliapointleasing@covenantpropertyservices.com', 'magnolia-point'),
+    ('oasisclubpm@covenantpropertyservices.com', 'oasis-club'),
+    ('oasisclubapm@covenantpropertyservices.com', 'oasis-club'),
+    ('aurora2700PM@covenantpropertyservices.com', 'aurora-2700'),
+    ('aurora2700APM@covenantpropertyservices.com', 'aurora-2700'),
+    ('Cielo325PM@covenantpropertyservices.com', 'cielo-325'),
+    ('GALeasingFloater@covenantpropertyservices.com', 'cielo-325'),
+    ('crose@covenantpropertyservices.com', 'andover-park'),
+    ('crose@covenantpropertyservices.com', 'fields-conover')
+    ) as v(email, property_id) on lower(u.email) = lower(v.email)
+  on conflict do nothing;
+
+insert into user_region_assignments (user_id, region_id)
+  select u.id, v.region_id from users u
+    join (values
+    ('jward@covenantpropertyservices.com', 'florida'),
+    ('jward@covenantpropertyservices.com', 'georgia')
+    ) as v(email, region_id) on lower(u.email) = lower(v.email)
+  on conflict do nothing;
 
 -- 5. Sign-up allowlist (SEED_DATA §8) ------------------------------------------
 -- Outside the two Workspace domains, only listed addresses may sign in.
@@ -87,55 +134,46 @@ insert into email_allowlist (email, note) values
   ('aarongorin@gmail.com', 'Aaron Gorin — founder, personal Gmail')
 on conflict (email) do update set note = excluded.note;
 
--- 6. Staff directory (SEED_DATA §7) — autocomplete source ----------------------
--- Rebuilt each run (purely seed-derived in M1). Personal Gmails are contact
--- info only, NOT login allowlist entries.
+-- 6. Staff directory (from roster/people.csv) — assignee autocomplete source.
+-- Rebuilt each run. One row per named person; unnamed/open seats live only as
+-- role mailboxes (§3). Corporate + region-wide people have null property_id.
+-- Personal Gmails are contact info only, NOT login allowlist entries.
 truncate directory_people;
 insert into directory_people (full_name, property_id, region_id, function, contact_email, is_vacant) values
-  -- Florida
-  ('Ayonda Parsons',          'kings-tree',        null, 'property_manager',                'kingsparkpm@covenantpropertyservices.com', false),
-  ('Jania Bristol',           'kings-tree',        null, 'leasing',                         null, false),
-  ('Henry Avila Acevedo',     'kings-tree',        null, 'maintenance (Supervisor, EPA)',   null, false),
-  ('Julio Diaz Rodriguez',    'kings-tree',        null, 'maintenance (Tech, EPA)',         null, false),
-  ('Vivianna Pinero',         'lakewood-oaks',     null, 'property_manager',                'LakewoodOaksPM@covenantpropertyservices.com', false),
-  ('Pedro Tellez Dacal',      'lakewood-oaks',     null, 'leasing',                         'Lakewoodoaksleasing@covenantpropertyservices.com', false),
-  ('Luis Perez Cancel',       'lakewood-oaks',     null, 'maintenance (Supervisor, EPA)',   null, false),
-  ('Sanchesz Maultsby',       'lakewood-oaks',     null, 'maintenance (Tech)',              null, false),
-  ('Alexei Freire Goyes',     'lakewood-oaks',     null, 'groundskeeper/porter',            null, false),
-  ('Jerika Ward',             'magnolia-point',    'florida', 'regional_manager',           'jward@covenantpropertyservices.com', false),
-  ('Tyra Jackson',            'magnolia-point',    null, 'property_manager',                'magnoliapointpm@covenantpropertyservices.com', false),
-  ('Leyla Nieto Perez',       'magnolia-point',    null, 'assistant_property_manager',      'magnoliapointapm@covenantpropertyservices.com', false),
-  ('Luis Batencourt',         'magnolia-point',    null, 'leasing',                         'magnoliapointleasing@covenantpropertyservices.com', false),
-  ('Gerardo Ceron Ayala',     'magnolia-point',    null, 'maintenance (Supervisor, EPA)',   null, false),
-  ('Edison Daniel, Jn',       'magnolia-point',    null, 'maintenance (Tech, EPA)',         null, false),
-  ('Danilo Menendez Rabassa', 'magnolia-point',    null, 'groundskeeper',                   null, false),
-  ('Linda Quasnick',          'oasis-club',        null, 'property_manager',                'oasisclubpm@covenantpropertyservices.com', false),
-  ('Elma Avila',              'oasis-club',        null, 'assistant_property_manager',      'oasisclubapm@covenantpropertyservices.com', false),
-  ('Vacant',                  'oasis-club',        null, 'leasing (OPEN)',                  'oasisclubleasing@covenantpropertyservices.com', true),
-  ('Diosmel Avila Pozo',      'oasis-club',        null, 'groundskeeper',                   null, false),
-  ('Ayonda Parsons',          'park-place',        null, 'property_manager',                'kingsparkpm@covenantpropertyservices.com', false),
-  ('Jania Bristol',           'park-place',        null, 'leasing',                         null, false),
-  ('Henry Avila Acevedo',     'park-place',        null, 'maintenance (Supervisor, EPA)',   null, false),
-  ('Julio Diaz Rodriguez',    'park-place',        null, 'maintenance (Tech, EPA)',         null, false),
-  ('Vacant',                  'silversmith-creek', null, 'property_manager (OPEN)',         'SilversmithPM@covenantpropertyservices.com', true),
-  ('Aldo Velasco Diaz',       'silversmith-creek', null, 'maintenance (Supervisor, EPA)',   'aldovelasco08@gmail.com', false), -- personal, contact only
-  ('Eddys Monzon',            'silversmith-creek', null, 'maintenance (Tech)',              null, false),
-  -- Georgia
-  ('Mariela Rivas',           'aurora-2700',       null, 'property_manager',                'aurora2700PM@covenantpropertyservices.com', false),
-  ('Teyani Stanton',          'aurora-2700',       null, 'assistant_property_manager',      'aurora2700APM@covenantpropertyservices.com', false),
-  ('Vacant',                  'aurora-2700',       null, 'leasing (OPEN)',                  'aurora2700leasing@covenantpropertyservices.com', true),
-  ('Vacant',                  'aurora-2700',       null, 'maintenance (Supervisor, OPEN)',  null, true),
-  ('Vacant',                  'aurora-2700',       null, 'maintenance (Tech, OPEN)',        null, true),
-  ('Dana Darby',              'cielo-325',         null, 'property_manager',                'Cielo325PM@covenantpropertyservices.com', false),
-  ('Jazmin Fuentes',          'cielo-325',         null, 'leasing',                         'GALeasingFloater@covenantpropertyservices.com', false),
-  ('Rasim Memishi',           'cielo-325',         null, 'maintenance (Supervisor, EPA)',   null, false),
-  -- North Carolina
-  ('Courtney (CJ) Rose',      'andover-park',      null, 'property_manager',                'crose@covenantpropertyservices.com', false),
-  ('Ariel Handy',             'andover-park',      null, 'leasing',                         null, false),
-  ('Marcus Davis',            'andover-park',      null, 'maintenance (Supervisor, EPA)',   'kaharidavis1@gmail.com', false), -- personal, contact only
-  ('Courtney (CJ) Rose',      'fields-conover',    null, 'senior_property_manager',         'crose@covenantpropertyservices.com', false),
-  ('Vacant',                  'l-building',        null, 'property_manager (OPEN)',          null, true),
-  -- Virginia (region-level RM; on-site staff TBD)
-  ('Crystal Martin',          null,                'virginia', 'regional_manager',           null, false);
+  ('Geoff Girnun', null, null, 'VP Operations / Asset Manager', 'geoff@cedargrovecp.com', false),
+  ('Steven Levitz', null, null, 'Partner', 'steve@cedargrovecp.com', false),
+  ('Aaron Gorin', null, null, 'Partner', 'aarongorin@gmail.com', false),
+  ('Cara McConnachie', null, null, 'Mgr Property & Lease Admin', 'cara@covenantpropertyservices.com', false),
+  ('Jackie Eriksen', null, null, 'Talent Acquisitions Mgr', 'jackie@covenantpropertyservices.com', false),
+  ('Shelley Balanda', null, null, 'Operations', 'shelley@covenantpropertyservices.com', false),
+  ('Jerika Ward', null, 'florida', 'Regional Manager', 'jward@covenantpropertyservices.com', false),
+  ('Jerika Ward', null, 'georgia', 'Regional Manager', 'jward@covenantpropertyservices.com', false),
+  ('Crystal Martin', null, 'virginia', 'Regional Manager', null, false),
+  ('Henry Avila Acevedo', 'kings-tree', null, 'Maintenance (Supervisor EPA)', null, false),
+  ('Vivianna Pinero', 'lakewood-oaks', null, 'Property Manager', 'LakewoodOaksPM@covenantpropertyservices.com', false),
+  ('Pedro Tellez Dacal', 'lakewood-oaks', null, 'Leasing', 'Lakewoodoaksleasing@covenantpropertyservices.com', false),
+  ('Luis Perez Cancel', 'lakewood-oaks', null, 'Maintenance (Supervisor EPA)', null, false),
+  ('Sanchesz Maultsby', 'lakewood-oaks', null, 'Maintenance (Tech)', null, false),
+  ('Alexei Freire Goyes', 'lakewood-oaks', null, 'Groundskeeper / Porter', null, false),
+  ('Tyra Jackson', 'magnolia-point', null, 'Property Manager', 'magnoliapointpm@covenantpropertyservices.com', false),
+  ('Leyla Nieto Perez', 'magnolia-point', null, 'Assistant Property Manager', 'magnoliapointapm@covenantpropertyservices.com', false),
+  ('Luis Batencourt', 'magnolia-point', null, 'Leasing', 'magnoliapointleasing@covenantpropertyservices.com', false),
+  ('Gerardo Ceron Ayala', 'magnolia-point', null, 'Maintenance (Supervisor EPA)', null, false),
+  ('Edison Daniel, Jn', 'magnolia-point', null, 'Maintenance (Tech EPA)', null, false),
+  ('Danilo Menendez Rabassa', 'magnolia-point', null, 'Groundskeeper', null, false),
+  ('Linda Quasnick', 'oasis-club', null, 'Property Manager', 'oasisclubpm@covenantpropertyservices.com', false),
+  ('Elma Avila', 'oasis-club', null, 'Assistant Property Manager', 'oasisclubapm@covenantpropertyservices.com', false),
+  ('Basha Buckley', 'oasis-club', null, 'Leasing', 'oasisclubleasing@covenantpropertyservices.com', false),
+  ('Diosmel Avila Pozo', 'oasis-club', null, 'Groundskeeper', null, false),
+  ('Henry Avila Acevedo', 'park-place', null, 'Maintenance (Supervisor EPA)', null, false),
+  ('Julio Diaz Rodriguez', 'park-place', null, 'Maintenance (Tech EPA)', null, false),
+  ('Eddys Monzon', 'silversmith-creek', null, 'Maintenance (Tech)', null, false),
+  ('Teyani Stanton', 'aurora-2700', null, 'Property Manager', 'aurora2700PM@covenantpropertyservices.com', false),
+  ('Dana Darby', 'cielo-325', null, 'Property Manager', 'Cielo325PM@covenantpropertyservices.com', false),
+  ('Rasim Memishi', 'cielo-325', null, 'Maintenance (Supervisor EPA)', null, false),
+  ('Courtney (CJ) Rose', 'andover-park', null, 'Property Manager', 'crose@covenantpropertyservices.com', false),
+  ('Ariel Handy', 'andover-park', null, 'Leasing', null, false),
+  ('Marcus Davis', 'andover-park', null, 'Maintenance (Supervisor EPA)', 'kaharidavis1@gmail.com', false),
+  ('Courtney (CJ) Rose', 'fields-conover', null, 'Senior Property Manager', 'crose@covenantpropertyservices.com', false);
 
 commit;

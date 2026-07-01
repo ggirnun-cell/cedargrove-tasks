@@ -1,0 +1,52 @@
+region,property,name,title_or_function,email,can_log_in,access_role,status,notes
+,Corporate,Geoff Girnun,VP Operations / Asset Manager,geoff@cedargrovecp.com,Yes,Super Admin,Active,
+,Corporate,Steven Levitz,Partner,steve@cedargrovecp.com,Yes,Super Admin,Active,
+,Corporate,Aaron Gorin,Partner,aarongorin@gmail.com,Yes,Super Admin,Active,personal gmail (allowlisted)
+,Corporate,Cara McConnachie,Mgr Property & Lease Admin,cara@covenantpropertyservices.com,Yes,Super Admin,Active,
+,Corporate,Jackie Eriksen,Talent Acquisitions Mgr,jackie@covenantpropertyservices.com,Yes,Super Admin,Active,
+,Corporate,Shelley Balanda,Operations,shelley@covenantpropertyservices.com,Yes,Read-only,Active,confirm scope/role
+Florida,Region-wide,Jerika Ward,Regional Manager,jward@covenantpropertyservices.com,Yes,Regional Manager,Active,covers FL + GA
+Georgia,Region-wide,Jerika Ward,Regional Manager,jward@covenantpropertyservices.com,Yes,Regional Manager,Active,role winding down
+Virginia,Region-wide,Crystal Martin,Regional Manager,,Yes,Regional Manager,Active,confirm email
+Florida,Kings Tree,,Property Manager,kingsparkpm@covenantpropertyservices.com,Yes,Property Manager,Active,
+Florida,Kings Tree,,Leasing,,No,,Active,no company email
+Florida,Kings Tree,Henry Avila Acevedo,Maintenance (Supervisor EPA),,No,,Active,
+Florida,Kings Tree,,Maintenance (Tech EPA),,No,,Active,
+Florida,Lakewood Oaks,Vivianna Pinero,Property Manager,LakewoodOaksPM@covenantpropertyservices.com,Yes,Property Manager,Active,
+Florida,Lakewood Oaks,Pedro Tellez Dacal,Leasing,Lakewoodoaksleasing@covenantpropertyservices.com,Yes,Staff,Active,
+Florida,Lakewood Oaks,Luis Perez Cancel,Maintenance (Supervisor EPA),,No,,Active,
+Florida,Lakewood Oaks,Sanchesz Maultsby,Maintenance (Tech),,No,,Active,
+Florida,Lakewood Oaks,Alexei Freire Goyes,Groundskeeper / Porter,,No,,Active,
+Florida,Magnolia Point,Tyra Jackson,Property Manager,magnoliapointpm@covenantpropertyservices.com,Yes,Property Manager,Active,
+Florida,Magnolia Point,Leyla Nieto Perez,Assistant Property Manager,magnoliapointapm@covenantpropertyservices.com,Yes,Assistant PM,Active,
+Florida,Magnolia Point,Luis Batencourt,Leasing,magnoliapointleasing@covenantpropertyservices.com,Yes,Staff,Active,
+Florida,Magnolia Point,Gerardo Ceron Ayala,Maintenance (Supervisor EPA),,No,,Active,
+Florida,Magnolia Point,"Edison Daniel, Jn",Maintenance (Tech EPA),,No,,Active,
+Florida,Magnolia Point,Danilo Menendez Rabassa,Groundskeeper,,No,,Active,
+Florida,Oasis Club,Linda Quasnick,Property Manager,oasisclubpm@covenantpropertyservices.com,Yes,Property Manager,Active,
+Florida,Oasis Club,Elma Avila,Assistant Property Manager,oasisclubapm@covenantpropertyservices.com,Yes,Assistant PM,Active,
+Florida,Oasis Club,Basha Buckley,Leasing,oasisclubleasing@covenantpropertyservices.com,No,,Vacant,OPEN seat — mailbox active
+Florida,Oasis Club,Diosmel Avila Pozo,Groundskeeper,,No,,Active,
+Florida,Park Place,,Property Manager,kingsparkpm@covenantpropertyservices.com,Yes,Property Manager,Active,shared with Kings Tree
+Florida,Park Place,,Leasing,,No,,Active,
+Florida,Park Place,Henry Avila Acevedo,Maintenance (Supervisor EPA),,No,,Active,
+Florida,Park Place,Julio Diaz Rodriguez,Maintenance (Tech EPA),,No,,Active,
+Florida,Silversmith Creek,,Property Manager,SilversmithPM@covenantpropertyservices.com,No,,Vacant,OPEN seat — mailbox active
+Florida,Silversmith Creek,,Maintenance (Supervisor EPA),aldovelasco08@gmail.com,No,,Active,personal email — contact only
+Florida,Silversmith Creek,Eddys Monzon,Maintenance (Tech),,No,,Active,
+Georgia,Aurora @ Twenty Seven Hundred,Teyani Stanton,Property Manager,aurora2700PM@covenantpropertyservices.com,Yes,Property Manager,Active,
+Georgia,Aurora @ Twenty Seven Hundred,,Assistant Property Manager,aurora2700APM@covenantpropertyservices.com,Yes,Assistant PM,Active,
+Georgia,Aurora @ Twenty Seven Hundred,,Leasing,aurora2700leasing@covenantpropertyservices.com,No,,Vacant,OPEN seat — mailbox active
+Georgia,Aurora @ Twenty Seven Hundred,,Maintenance (Supervisor),,No,,Vacant,OPEN seat
+Georgia,Aurora @ Twenty Seven Hundred,,Maintenance (Tech),,No,,Vacant,OPEN seat
+Georgia,Cielo @ 325,Dana Darby,Property Manager,Cielo325PM@covenantpropertyservices.com,Yes,Property Manager,Active,
+Georgia,Cielo @ 325,,Leasing,GALeasingFloater@covenantpropertyservices.com,Yes,Staff,Active,GA leasing floater
+Georgia,Cielo @ 325,Rasim Memishi,Maintenance (Supervisor EPA),,No,,Active,
+North Carolina,Andover Park,Courtney (CJ) Rose,Property Manager,crose@covenantpropertyservices.com,Yes,Property Manager,Active,
+North Carolina,Andover Park,Ariel Handy,Leasing,,No,,Active,
+North Carolina,Andover Park,Marcus Davis,Maintenance (Supervisor EPA),kaharidavis1@gmail.com,No,,Active,personal email — contact only
+North Carolina,Fields Conover,Courtney (CJ) Rose,Senior Property Manager,crose@covenantpropertyservices.com,Yes,Property Manager,Active,shared with Andover Park
+North Carolina,L Building,,Property Manager,,No,,Vacant,OPEN seat
+Virginia,Lansdale Garden,,,,No,,Active,VA on-site staff TBD — add rows here
+Virginia,Miramar,,,,No,,Active,VA on-site staff TBD — add rows here
+Virginia,Windsor Court,,,,No,,Active,VA on-site staff TBD — add rows here

@@ -13,7 +13,7 @@ type Suggestion = {
   kind: "role" | "person";
   label: string;
   recipientEmail: string | null;
-  propertyId: string;
+  propertyId: string | null; // null for corporate / region-wide people
   jobFunction: JobFunction | null;
 };
 
@@ -81,6 +81,25 @@ export async function GET(request: Request): Promise<Response> {
     [allowed, like],
   );
 
+  // Corporate + region-wide people (property_id null) — e.g. partners, regional
+  // managers. Not property-scoped, so they aren't in the allowed-property joins
+  // above; surfaced here so they can be assigned (a person target with no
+  // property → a standalone task, creatable by super-admins).
+  const corporate = await query<{
+    full_name: string;
+    contact_email: string | null;
+    region_name: string | null;
+  }>(
+    `select dp.full_name, dp.contact_email, r.name as region_name
+       from directory_people dp
+       left join regions r on r.id = dp.region_id
+      where dp.property_id is null
+        and (dp.full_name ilike $1 or dp.contact_email ilike $1)
+      order by dp.full_name
+      limit 15`,
+    [like],
+  );
+
   const suggestions: Suggestion[] = [
     ...roles.rows.map((r) => ({
       kind: "role" as const,
@@ -98,5 +117,20 @@ export async function GET(request: Request): Promise<Response> {
     })),
   ];
 
-  return NextResponse.json({ suggestions: suggestions.slice(0, 30) });
+  // Dedupe corporate/region people by email (regional managers appear per region).
+  const seen = new Set<string>();
+  for (const c of corporate.rows) {
+    const key = (c.contact_email ?? c.full_name).toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    suggestions.push({
+      kind: "person",
+      label: `${c.full_name}${c.region_name ? ` — ${c.region_name} (regional)` : " (Corporate)"}${c.contact_email ? "" : " (no email)"}`,
+      recipientEmail: c.contact_email,
+      propertyId: null,
+      jobFunction: null,
+    });
+  }
+
+  return NextResponse.json({ suggestions: suggestions.slice(0, 40) });
 }
