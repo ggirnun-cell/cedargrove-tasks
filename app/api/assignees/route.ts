@@ -100,6 +100,17 @@ export async function GET(request: Request): Promise<Response> {
     [like],
   );
 
+  // Also pull super-admins (corporate) straight from the users table, so
+  // Geoff/Steve/etc. are always assignable even if the directory isn't seeded.
+  const corpUsers = await query<{ email: string; full_name: string | null }>(
+    `select email, full_name from users
+      where role = 'super_admin' and is_active
+        and (full_name ilike $1 or email ilike $1)
+      order by full_name
+      limit 10`,
+    [like],
+  );
+
   const suggestions: Suggestion[] = [
     ...roles.rows.map((r) => ({
       kind: "role" as const,
@@ -117,20 +128,23 @@ export async function GET(request: Request): Promise<Response> {
     })),
   ];
 
-  // Dedupe corporate/region people by email (regional managers appear per region).
+  // Dedupe corporate/region people by email across both sources (directory
+  // regional managers appear per region; users table has the super-admins).
   const seen = new Set<string>();
-  for (const c of corporate.rows) {
-    const key = (c.contact_email ?? c.full_name).toLowerCase();
-    if (seen.has(key)) continue;
+  const addCorporate = (name: string, email: string | null, regionName: string | null) => {
+    const key = (email ?? name).toLowerCase();
+    if (seen.has(key)) return;
     seen.add(key);
     suggestions.push({
       kind: "person",
-      label: `${c.full_name}${c.region_name ? ` — ${c.region_name} (regional)` : " (Corporate)"}${c.contact_email ? "" : " (no email)"}`,
-      recipientEmail: c.contact_email,
+      label: `${name}${regionName ? ` — ${regionName} (regional)` : " (Corporate)"}${email ? "" : " (no email)"}`,
+      recipientEmail: email,
       propertyId: null,
       jobFunction: null,
     });
-  }
+  };
+  for (const c of corporate.rows) addCorporate(c.full_name, c.contact_email, c.region_name);
+  for (const u of corpUsers.rows) addCorporate(u.full_name ?? u.email, u.email, null);
 
   return NextResponse.json({ suggestions: suggestions.slice(0, 40) });
 }

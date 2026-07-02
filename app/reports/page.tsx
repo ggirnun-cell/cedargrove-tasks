@@ -117,14 +117,14 @@ export default async function ReportsPage({
             Person (email)
             <input name="person" defaultValue={filter.person ?? ""} placeholder="contains…" className={inputCls} />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-cg-ink/60">
-            {completed ? "Completed from" : "Created from"}
-            <input type="date" name="from" defaultValue={filter.from ?? ""} className={inputCls} />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-cg-ink/60">
-            To
-            <input type="date" name="to" defaultValue={filter.to ?? ""} className={inputCls} />
-          </label>
+          <div className="flex flex-col gap-1 text-xs text-cg-ink/60">
+            {completed ? "Completed date range" : "Created date range"}
+            <div className="flex items-center gap-2">
+              <input type="date" name="from" defaultValue={filter.from ?? ""} className={inputCls} aria-label="From date" />
+              <span className="text-cg-ink/40">–</span>
+              <input type="date" name="to" defaultValue={filter.to ?? ""} className={inputCls} aria-label="To date" />
+            </div>
+          </div>
           <div className="flex gap-2">
             <button type="submit" className="rounded bg-cg-copper px-3 py-1.5 text-sm font-medium text-white hover:bg-cg-copper/90">
               Apply
