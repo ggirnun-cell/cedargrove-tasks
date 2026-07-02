@@ -4,7 +4,6 @@ region,property,name,title_or_function,email,can_log_in,access_role,status,notes
 ,Corporate,Aaron Gorin,Partner,aarongorin@gmail.com,Yes,Super Admin,Active,personal gmail (allowlisted)
 ,Corporate,Cara McConnachie,Mgr Property & Lease Admin,cara@covenantpropertyservices.com,Yes,Super Admin,Active,
 ,Corporate,Jackie Eriksen,Talent Acquisitions Mgr,jackie@covenantpropertyservices.com,Yes,Super Admin,Active,
-,Corporate,Shelley Balanda,Operations,shelley@covenantpropertyservices.com,Yes,Read-only,Active,confirm scope/role
 Florida,Region-wide,Jerika Ward,Regional Manager,jward@covenantpropertyservices.com,Yes,Regional Manager,Active,covers FL + GA
 Georgia,Region-wide,Jerika Ward,Regional Manager,jward@covenantpropertyservices.com,Yes,Regional Manager,Active,role winding down
 Virginia,Region-wide,Crystal Martin,Regional Manager,,Yes,Regional Manager,Active,confirm email
