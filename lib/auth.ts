@@ -78,10 +78,14 @@ export async function provisionUser(params: {
   if (!(await isEmailAllowed(email))) return null;
 
   const result = await query<UserRow>(
+    // full_name: PREFER the existing (roster/admin-set) name — a person's Google
+    // sign-in must not overwrite how the roster displays them. Clerk's name is
+    // only used to seed a brand-new row (the insert). Seeding (db/seed.sql) is
+    // authoritative and overwrites via its own ON CONFLICT.
     `insert into users (email, full_name, clerk_id, role, is_active)
        values ($1, $2, $3, 'read_only', true)
      on conflict (email) do update set
-       full_name  = coalesce(excluded.full_name, users.full_name),
+       full_name  = coalesce(users.full_name, excluded.full_name),
        clerk_id   = coalesce(users.clerk_id, excluded.clerk_id),
        updated_at = now()
      returning id, email, full_name, role, can_manage_users, is_active`,

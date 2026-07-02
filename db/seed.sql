@@ -71,7 +71,7 @@ on conflict (property_id, function) do update set
 -- person signs in. Re-seeding RESETS role to the roster; clerk_id/name from
 -- sign-in are preserved. Access is granted in section 4b.
 insert into users (email, full_name, role, can_manage_users) values
-  ('geoff@cedargrovecp.com', 'Geoff Girnun', 'super_admin', true),
+  ('geoff@cedargrovecp.com', 'Geoff Miller', 'super_admin', true),
   ('steve@cedargrovecp.com', 'Steven Levitz', 'super_admin', true),
   ('aarongorin@gmail.com', 'Aaron Gorin', 'super_admin', true),
   ('cara@covenantpropertyservices.com', 'Cara McConnachie', 'super_admin', true),
@@ -139,7 +139,7 @@ on conflict (email) do update set note = excluded.note;
 -- Personal Gmails are contact info only, NOT login allowlist entries.
 truncate directory_people;
 insert into directory_people (full_name, property_id, region_id, function, contact_email, is_vacant) values
-  ('Geoff Girnun', null, null, 'VP Operations / Asset Manager', 'geoff@cedargrovecp.com', false),
+  ('Geoff Miller', null, null, 'VP Operations / Asset Manager', 'geoff@cedargrovecp.com', false),
   ('Steven Levitz', null, null, 'Partner', 'steve@cedargrovecp.com', false),
   ('Aaron Gorin', null, null, 'Partner', 'aarongorin@gmail.com', false),
   ('Cara McConnachie', null, null, 'Mgr Property & Lease Admin', 'cara@covenantpropertyservices.com', false),
