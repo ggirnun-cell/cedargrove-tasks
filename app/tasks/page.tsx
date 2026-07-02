@@ -63,15 +63,15 @@ export default async function TasksPage({
           ))}
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-md border border-cg-green/15 bg-white">
+        <div className="mt-4 overflow-x-auto rounded-md border border-cg-green/15 bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-cg-green/15 bg-cg-green/5 text-left text-xs uppercase tracking-wide text-cg-ink/60">
                 <th className="px-4 py-2 font-medium">Task</th>
                 <th className="px-4 py-2 font-medium">Property</th>
-                <th className="px-4 py-2 font-medium">Assignee</th>
+                <th className="hidden px-4 py-2 font-medium md:table-cell">Assignee</th>
                 <th className="px-4 py-2 font-medium">Priority</th>
-                <th className="px-4 py-2 font-medium">Age</th>
+                <th className="hidden px-4 py-2 font-medium sm:table-cell">Age</th>
                 <th className="px-4 py-2 font-medium"></th>
               </tr>
             </thead>
@@ -89,11 +89,11 @@ export default async function TasksPage({
                     )}
                   </td>
                   <td className="px-4 py-2 text-cg-ink/70">{t.property_name ?? "Corporate"}</td>
-                  <td className="px-4 py-2 text-cg-ink/70">{t.assignee_label}</td>
+                  <td className="hidden px-4 py-2 text-cg-ink/70 md:table-cell">{t.assignee_label}</td>
                   <td className="px-4 py-2">
                     <PriorityBadge priority={t.priority} />
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="hidden px-4 py-2 sm:table-cell">
                     <AgeLabel createdAt={t.created_at} />
                   </td>
                   <td className="px-4 py-2 text-right">

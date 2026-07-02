@@ -17,11 +17,11 @@ export function AppHeader({
     `font-medium hover:underline ${active === key ? "text-cg-copper" : "text-cg-green"}`;
   return (
     <header className="border-b-2 border-cg-copper bg-white">
-      <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-5 py-3">
+      <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-5">
         <Link href="/" aria-label="Home">
-          <BrandMark className="h-9 w-auto" />
+          <BrandMark className="h-8 w-auto sm:h-9" />
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
           <Link href="/tasks" className={cls("tasks")}>
             Tasks
           </Link>
@@ -37,7 +37,7 @@ export function AppHeader({
             </Link>
           )}
           <SignOutButton>
-            <button className="rounded border border-cg-green/30 px-3 py-1 text-xs font-medium text-cg-green hover:bg-cg-green/5">
+            <button className="rounded border border-cg-green/30 px-3 py-1.5 text-xs font-medium text-cg-green hover:bg-cg-green/5">
               Sign out
             </button>
           </SignOutButton>

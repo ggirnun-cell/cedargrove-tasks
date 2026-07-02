@@ -55,14 +55,14 @@ export default async function UsersPage() {
         read-only with no access.
       </p>
 
-      <div className="mt-5 overflow-hidden rounded-md border border-cg-green/15 bg-white">
+      <div className="mt-5 overflow-x-auto rounded-md border border-cg-green/15 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-cg-green/15 bg-cg-green/5 text-left text-xs uppercase tracking-wide text-cg-ink/60">
               <th className="px-4 py-2 font-medium">Name</th>
               <th className="px-4 py-2 font-medium">Role</th>
-              <th className="px-4 py-2 font-medium">Access</th>
-              <th className="px-4 py-2 font-medium">Status</th>
+              <th className="hidden px-4 py-2 font-medium sm:table-cell">Access</th>
+              <th className="hidden px-4 py-2 font-medium sm:table-cell">Status</th>
               <th className="px-4 py-2"></th>
             </tr>
           </thead>
@@ -81,7 +81,7 @@ export default async function UsersPage() {
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-2 text-cg-ink/70">
+                <td className="hidden px-4 py-2 text-cg-ink/70 sm:table-cell">
                   {u.role === "super_admin"
                     ? "All properties"
                     : [
@@ -93,7 +93,7 @@ export default async function UsersPage() {
                         .filter(Boolean)
                         .join(", ") || "None"}
                 </td>
-                <td className="px-4 py-2">
+                <td className="hidden px-4 py-2 sm:table-cell">
                   {u.is_active ? (
                     <span className="text-cg-green">Active</span>
                   ) : (

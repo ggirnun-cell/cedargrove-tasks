@@ -71,7 +71,7 @@ export default async function TaskDetailPage({
           <CompleteForm taskId={task.id} isComplete={task.is_complete} canAct={canAct} />
         </div>
 
-        <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 rounded-md border border-cg-green/15 bg-white p-5 text-sm">
+        <dl className="mt-5 grid grid-cols-1 gap-x-6 gap-y-3 rounded-md border border-cg-green/15 bg-white p-5 text-sm sm:grid-cols-2">
           <Field label="Property" value={task.property_name ?? "Corporate / standalone"} />
           <Field label="Assignee" value={task.assignee_label} />
           <Field label="Pings to" value={task.recipient_email ?? "— (no mailbox set)"} />
